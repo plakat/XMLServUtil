@@ -1,8 +1,5 @@
 package com.xmlserv.util.db;
 
-import com.xmlserv.main.*;
-import com.xmlserv.util.*;
-
 import java.sql.*;
 import java.util.*;
 import java.util.regex.*;
@@ -65,7 +62,7 @@ public class NamedPreparedStatement
     }
 
 
-    public int executeUpdate(Connection con) throws SQLException, XMLServException
+    public int executeUpdate(Connection con) throws SQLException
     {
         processParameters(con);
 
@@ -73,7 +70,7 @@ public class NamedPreparedStatement
     }
 
 
-    public ResultSet executeQuery(Connection con) throws SQLException, XMLServException
+    public ResultSet executeQuery(Connection con) throws SQLException
     {
         processParameters(con);
 
@@ -88,7 +85,7 @@ public class NamedPreparedStatement
     }
 
 
-    private void processParameters(Connection con) throws SQLException, XMLServException
+    private void processParameters(Connection con) throws SQLException
     {
         String processedQuery = this.query;
         this.psth = new PreparedStatementHelper();

@@ -34,33 +34,38 @@ public class HtmlUtil
     {
         String out = in;
 
-        try
-        {
-            RE ampEntity = new RE("&");
-            out = ampEntity.subst(out, "&amp;");
+//        try
+//        {
+//            RE ampEntity = new RE("&");
+//            out = ampEntity.subst(out, "&amp;");
+            out = out.replaceAll("&", "&amp;");
 
-            RE ltEntity = new RE("<");
-            out = ltEntity.subst(out, "&lt;");
+//            RE ltEntity = new RE("<");
+//            out = ltEntity.subst(out, "&lt;");
+            out = out.replaceAll("<", "&lt;");
 
-            RE gtEntity = new RE(">");
-            out = gtEntity.subst(out, "&gt;");
+//            RE gtEntity = new RE(">");
+//            out = gtEntity.subst(out, "&gt;");
+            out = out.replaceAll(">", "&gt;");
 
             //[]
-            RE link = new RE("\\s(http://[^\"\\s]+)\\s");
-            int i = 0;
-            while(link.match(out))
-            {
-                String thisLink = link.getParen(1);
-                out = link.subst(out, " <a href=\""+thisLink+"\" target=\"_blank\">"+thisLink+"</a> ", RE.REPLACE_FIRSTONLY);
-                //System.out.println("Iteration "+i+": thisLink="+thisLink+", out="+out);
-                i++;
-            }
+//            RE link = new RE("\\s(http://[^\"\\s]+)\\s");
+//            int i = 0;
+//            while(link.match(out))
+//            {
+//                String thisLink = link.getParen(1);
+//                out = link.subst(out, " <a href=\""+thisLink+"\" target=\"_blank\">"+thisLink+"</a> ", RE.REPLACE_FIRSTONLY);
+//                //System.out.println("Iteration "+i+": thisLink="+thisLink+", out="+out);
+//                i++;
+//            }
+            out = out.replaceAll("\\s(http://[^\"\\s]+)\\s", "<a href=\"$1\" target=\"_blank\">$1</a>");
 
-            RE linebreak = new RE("\n");
-            out = linebreak.subst(out, "<br/>\n");
-        }
-        catch(RESyntaxException res)
-        { res.printStackTrace(); }
+//            RE linebreak = new RE("\n");
+//            out = linebreak.subst(out, "<br/>\n");
+            out = out.replaceAll("[\r\n]+", "<br />\n");
+//        }
+//        catch(RESyntaxException res)
+//        { res.printStackTrace(); }
 
         return out;
     }

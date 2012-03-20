@@ -1,6 +1,5 @@
 package com.xmlserv.util.tests;
 
-import com.xmlserv.main.*;
 import com.xmlserv.util.db.*;
 import junit.framework.*;
 
@@ -23,9 +22,8 @@ public class TestNamedPreparedStatement extends TestCase
         {
             nps.executeQuery(null);
         }
-        catch(SQLException e)
-        {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        catch(SQLException e) {
+            e.printStackTrace(System.out);
         }
     }
 }

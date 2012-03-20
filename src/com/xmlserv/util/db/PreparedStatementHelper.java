@@ -1,8 +1,5 @@
 package com.xmlserv.util.db;
 
-import com.xmlserv.main.*;
-import com.xmlserv.util.*;
-
 import java.sql.*;
 import java.util.*;
 
@@ -17,17 +14,10 @@ public class PreparedStatementHelper
     {}
 
 
-    public PreparedStatementHelper(Connection con, String query) throws XMLServException
+    public PreparedStatementHelper(Connection con, String query) throws SQLException
     {
         this.query = query;
-        try
-        {
-            this.pst = con.prepareStatement(query);
-        }
-        catch(SQLException e)
-        {
-            throw new XMLServException("SQLException: "+e.getMessage(), "-2: PREPAREDSTATEMENTHELPER-SQL-EXCEPTION", e);
-        }
+        this.pst = con.prepareStatement(query);
     }
 
 
@@ -38,17 +28,10 @@ public class PreparedStatementHelper
     }
 
 
-    public void setPreparedStatement(Connection con, String query) throws XMLServException
+    public void setPreparedStatement(Connection con, String query) throws SQLException
     {
         this.query = query;
-        try
-        {
-            this.pst = con.prepareStatement(query);
-        }
-        catch(SQLException e)
-        {
-            throw new XMLServException("SQLException: "+e.getMessage(), "-2: PREPAREDSTATEMENTHELPER-SQL-EXCEPTION", e);
-        }
+        this.pst = con.prepareStatement(query);
     }
 
 
@@ -214,7 +197,7 @@ public class PreparedStatementHelper
     {
         processParameters();
         String query = pst.toString();
-        return DBUtil.extractCondition(query);
+        return PSTHUtil.extractCondition(query);
     }
 
 
@@ -238,6 +221,19 @@ public class PreparedStatementHelper
         }
         catch(Exception e)
         { return "(Error creating query string: "+e.getMessage()+" Empty query string: "+query+")"; }
+    }
+
+
+    /**
+     * Just close without throwing an Exception (useful in finally{})
+     */
+    public void forceClose()
+    {
+        try {
+            this.close();
+        }
+        catch(SQLException ignored) {
+        }
     }
 
 

@@ -1,0 +1,295 @@
+<?xml version="1.0"?>
+
+<!-- $Id: build.xml,v 1.35 2009/04/11 15:37:16 muecke Exp $ -->
+<!-- Author: Wolfram Saringer   -->
+<!-- Ant Buildfile for XMLServ  -->
+
+
+<project name="xmlserv" default="all" basedir=".">
+
+    <!-- Project directory structure -->
+    <property name="src.dir" value="src"/>
+    <property name="doc.dir" value="Doc"/>
+    <property name="dist.dir" value="dist"/>
+
+    <!-- config related settings: -->
+    <property name="config.basedir" value="config"/>
+    <property name="config.template" value="template"/>
+    <!-- default config, used in target war if not overridden -->
+    <property name="config" value="xmlserv"/>
+
+    <!-- Host to deploy to (Tomcat 4 required) -->
+    <property name="tomcat.server" value="http://localhost:8080"/>
+    <property name="tomcat.manager" value="${tomcat.server}/manager"/>
+
+    <!-- System libraries: -->
+    <!-- <property name="system.jars" value="/usr/local/java/ext" /> -->
+    <property name="system.jars" value="./java-lib"/>
+    <property name="antlib.dir" value="./ant-lib"/>
+
+    <property name="resources" value="./resources"/>
+
+    <!-- Build directory structure -->
+    <property name="build.dir" value="build"/>
+    <property name="build.classes" value="${build.dir}/classes"/>
+    <property name="build.doc" value="${build.dir}/doc"/>
+    <property name="webinf" value="WEB-INF"/>
+    <property name="webinf.lib" value="WEB-INF/lib"/>
+    <property name="webinf.classes" value="WEB-INF/classes"/>
+
+    <!-- Global settings -->
+    <property name="javac.debug" value="on"/>
+    <property name="build.compiler" value="modern"/>
+    <property name="build.source" value="1.5"/>
+    <property name="build.target" value="1.5"/>
+
+    <path id="classpath">
+        <fileset dir="${system.jars}">
+            <include name="**/*.jar"/>
+            <include name="**/*.zip"/>
+        </fileset>
+    </path>
+
+
+    <!-- Create the build directories -->
+    <target name="prepare">
+        <!-- <mkdir dir="${build.dir}"/>-->
+        <mkdir dir="${build.classes}"/>
+        <mkdir dir="${build.doc}"/>
+		<mkdir dir="${config.basedir}/${config}/${webinf.lib}"/>
+        <tstamp/>
+        <!-- <echo message="${TSTAMP}" /> -->
+    </target>
+
+
+    <!-- Build the servlet classes and jar -->
+    <target name="compile" depends="prepare">
+        <javac encoding="UTF-8" target="${build.target}" source="${build.source}"
+            destdir="${build.classes}" debug="${javac.debug}" deprecation="on" fork="true" memoryMaximumSize="256m" includeantruntime="true">
+            <src path="${src.dir}"/>
+            <classpath refid="classpath"/>
+        </javac>
+    </target>
+
+    <target name="servlet" depends="compile">
+        <jar jarfile="${config.basedir}/${config}/${webinf.lib}/xmlserv.jar"
+            basedir="${build.classes}"/>
+    </target>
+
+
+    <!-- create jar for deploying SOAP Service for Stingray -->
+    <target name="stingray" depends="servlet">
+        <jar jarfile="stingray-soap.jar" basedir="${build.classes}">
+            <include name="com/xmlserv/util/Stingray.class"/>
+            <include name="com/xmlserv/util/LocalStingray.class"/>
+            <include name="com/xmlserv/util/Codecs.class"/>
+            <include name="com/xmlserv/util/Codecs$CT.class"/>
+            <include name="com/xmlserv/util/Codecs$FilenameMangler.class"/>
+            <include name="com/xmlserv/util/Codecs$HttpHeaderElement.class"/>
+            <include name="com/xmlserv/util/Codecs$NVPair.class"/>
+            <include name="com/xmlserv/util/CodecsUtil.class"/>
+            <include name="com/xmlserv/util/Coder.class"/>
+            <include name="com/xmlserv/util/UserAgent.class"/>
+            <include name="com/xmlserv/util/SafeBufferedReader.class"/>
+            <include name="com/xmlserv/util/XmlUtil.class"/>
+            <include name="com/xmlserv/util/ZipUtil.class"/>
+            <include name="com/xmlserv/main/ErrorPage.class"/>
+            <include name="com/xmlserv/main/XMLServException.class"/>
+        </jar>
+    </target>
+
+    <target name="updatelog4j">
+        <!-- force inclusion of log4j: -->
+        <copy todir="${config.basedir}/${config}/${webinf.lib}">
+            <fileset dir="${system.jars}" includes="log4j*.jar"/>
+        </copy>
+        <copy todir="${config.basedir}/${config}/${webinf.classes}" filtering="yes">
+            <filterset>
+                <filter token="config" value="${config}"/>
+            </filterset>
+            <fileset dir="${resources}" includes="**/*.properties"
+                     defaultexcludes="true"/>
+        </copy>
+    </target>
+
+
+    <!-- Build the WAR archive -->
+    <target name="war" depends="updatelog4j,servlet">
+        <!-- <copy todir="${webinf.classes}">
+    <fileset dir="${samples.dir}" includes="**/*.class" />
+  </copy> -->
+        
+        <jar jarfile="${config}.war" basedir="${config.basedir}/${config}">
+            <include name="WEB-INF/**"/>
+            <include name="HTML/**"/>
+        </jar>
+    </target>
+
+
+    <!--
+        Create a new configuration
+        This creates a subdirectory under $config with the given name and copies the contents of 
+        $templateconfig there.
+        Required parameter: newconf
+        Can be passed in on the command line like this:
+        ant -Dnewconf=configname where configname is the name of the new configuration. 
+-->
+    <target name="newconf">
+        <!-- Copy default config to new name: -->
+        <copy todir="${config.basedir}/${newconf}" filtering="yes">
+            <filterset>
+                <filter token="newconf" value="${newconf}"/>
+            </filterset>
+            <fileset dir="${config.basedir}/${config.template}" includes="**/*"
+                defaultexcludes="true"/>
+        </copy>
+        <!-- Replace dbname in config.xml: -->
+        <!--  <replace file="${config.basedir}/${newconf}/WEB-INF/config.xml">
+    <replacetoken>@dbname@</replacetoken>
+    <replacevalue>${newconf}</replacevalue>
+  </replace>
+-->
+        <!-- now do a CVS add for directories: -->
+        <!--<apply dir="." executable="cvs" skipemptyfilesets="true" type="dir" failonerror="true"
+            relative="true" parallel="true">
+            <arg line="add"/>
+            <fileset dir="." includes="${config.basedir}/${newconf}/**"
+                excludes="${config.basedir}/${newconf}/**/*.jar" defaultexcludes="true"/>
+        </apply>-->
+        <!-- now do a CVS add for files: -->
+        <!--<apply dir="." executable="cvs" skipemptyfilesets="true" type="file" failonerror="true"
+            relative="true" parallel="true">
+            <arg line="add"/>
+            <fileset dir="." includes="${config.basedir}/${newconf}/**"
+                excludes="${config.basedir}/${newconf}/**/*.jar" defaultexcludes="true"/>
+        </apply>-->
+
+		<apply dir="." executable="hg" skipemptyfilesets="true" type="dir" failonerror="true"
+            relative="true" parallel="true">
+            <arg line="add"/>
+            <fileset dir="." includes="${config.basedir}/${newconf}"
+                excludes="${config.basedir}/${newconf}/**/*.jar" defaultexcludes="true"/>
+        </apply>
+
+        <!-- done while copying...
+		<echo
+            message="Don't forget to edit WEB-INF/config.xml and replace @newconf@ with the new configuration name ${newconf}."
+        />-->
+    </target>
+
+
+    <!-- Clean -->
+    <target name="clean">
+        <delete>
+            <fileset dir="${build.dir}" includes="**/*.class"/>
+            <fileset dir="${webinf.lib}" includes="*.jar"/>
+            <fileset dir="." includes="*.war"/>
+        </delete>
+    </target>
+
+
+    <!-- Remove all generated files/directories -->
+    <target name="distclean">
+        <delete dir="${build.dir}"/>
+        <delete>
+            <fileset dir="${webinf}">
+                <include name="**/*.class"/>
+            </fileset>
+        </delete>
+        <delete file="${webinf.lib}/xmlserv.jar"/>
+        <delete file="xmlserv.war"/>
+    </target>
+
+
+    <!--
+  Package distribution:
+  optional parameter: config - the configuration name to package  
+-->
+    <target name="package" depends="war">
+        <zip defaultexcludes="true" destfile="XMLServ-${config}.zip">
+            <zipfileset prefix="XMLServ-${config}" dir="." includes="${config}.war"/>
+            <zipfileset prefix="XMLServ-${config}" dir="." includes="SQL/**/*.sql"/>
+            <zipfileset prefix="XMLServ-${config}" dir="." filemode="755" includes="scripts/**/*"/>
+            <zipfileset prefix="XMLServ-${config}" dir="." includes="java-lib/**/*.jar"/>
+            <zipfileset prefix="XMLServ-${config}" dir="." includes="INSTALL"/>
+            <zipfileset prefix="XMLServ-${config}" dir="." includes="Doc/**/*"/>
+            <zipfileset prefix="XMLServ-${config}" dir="." includes="DTD/**/*"/>
+            <zipfileset prefix="XMLServ-${config}" dir="." includes="*.js"/>
+        </zip>
+    </target>
+
+
+    <!-- Create distribution archive -->
+    <target name="dist">
+        <zip defaultexcludes="true" destfile="XMLServ-src.zip">
+            <zipfileset prefix="XMLServ" dir="." includes="**/build.xml"/>
+            <zipfileset prefix="XMLServ" dir="." includes="**/*.java"/>
+            <zipfileset prefix="XMLServ" dir="." includes="SQL/**"/>
+            <zipfileset prefix="XMLServ" dir="." includes="config/**/*"/>
+            <zipfileset prefix="XMLServ" dir="." includes="INSTALL"/>
+            <zipfileset prefix="XMLServ" dir="." includes="Doc/**"/>
+            <zipfileset prefix="XMLServ" dir="." includes="DTD/**"/>
+            <zipfileset prefix="XMLServ" dir="." includes="scripts/**"/>
+            <zipfileset prefix="XMLServ" dir="." includes="java-lib/**"/>
+            <zipfileset prefix="XMLServ" dir="." includes="*.js"/>
+        </zip>
+    </target>
+
+
+    <!-- Deploy webapp -->
+    <target name="deploy" depends="servlet,war,tomcatinit,undeploy">
+
+        <!-- Define install task (depends upon library in ant-lib/) -->
+        <taskdef name="install" classname="org.apache.catalina.ant.InstallTask">
+            <classpath>
+                <path location="${antlib.dir}/catalina-ant.jar"/>
+            </classpath>
+        </taskdef>
+
+        <pathconvert dirsep="/" property="fullWarDir">
+            <path>
+                <pathelement location="./${config}.war"/>
+            </path>
+        </pathconvert>
+        <echo message="fullWarDir=${fullWarDir}"/>
+
+        <!-- Copy over: -->
+        <exec executable="scp">
+            <arg line=""/>
+        </exec>
+        <install url="${tomcat.manager}" username="antdeploy" password="taxi9101" path="/${config}"
+            war="jar:file:/${fullWarDir}!/"/>
+
+    </target>
+
+
+    <!-- Undeploy webapp -->
+    <target name="undeploy" depends="tomcatinit" if="is.webapp.deployed">
+        <taskdef name="remove" classname="org.apache.catalina.ant.RemoveTask">
+            <classpath>
+                <path location="${antlib.dir}/catalina-ant.jar"/>
+            </classpath>
+        </taskdef>
+
+        <remove url="${tomcat.manager}" username="antdeploy" password="taxi9101" path="/${config}"/>
+    </target>
+
+
+    <!-- Set status properties for tomcat webapp deploy -->
+    <target name="tomcatinit">
+        <condition property="is.tomcat.started">
+            <http url="${tomcat.server}"/>
+        </condition>
+
+        <condition property="is.webapp.deployed">
+            <and>
+                <isset property="is.tomcat.started"/>
+                <http url="${tomcat.server}/${config}"/>
+            </and>
+        </condition>
+    </target>
+
+    <!-- Default target: -->
+    <target name="all" depends="servlet,war"/>
+
+</project>

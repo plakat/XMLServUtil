@@ -2,7 +2,6 @@ package com.xmlserv.util.xml;
 
 import com.xmlserv.util.*;
 import com.xmlserv.util.exceptions.*;
-import com.xmlserv.util.xml.*;
 import org.jdom.*;
 
 import java.text.*;
@@ -30,14 +29,14 @@ public class XmlServJDOMElement
 
     public XmlServJDOMElement(String s, String s1)
     {
-        // todo: com.xmlserv.util.XmlUtil.cleanupControlCharacters()
+        // todo: com.xmlserv.util.xml.XmlUtil.cleanupControlCharacters()
         super(s, s1);
     }
 
 
     public XmlServJDOMElement(String s, String s1, String s2)
     {
-        // todo: com.xmlserv.util.XmlUtil.cleanupControlCharacters()
+        // todo: com.xmlserv.util.xml.XmlUtil.cleanupControlCharacters()
         super(s, s1, s2);
     }
 
@@ -50,7 +49,7 @@ public class XmlServJDOMElement
 
     public Element addContent(String s)
     {
-        // todo: com.xmlserv.util.XmlUtil.cleanupControlCharacters()
+        // todo: com.xmlserv.util.xml.XmlUtil.cleanupControlCharacters()
         if(s == null)
             return super.addContent("");
         else
@@ -85,11 +84,18 @@ public class XmlServJDOMElement
     {
         return super.addContent(obj.toElement());
     }
-    
+
+
+    @Override
+    public Element addContent(Content child)
+    {
+        return super.addContent(child);    //todo: implement com.xmlserv.util.xml.XmlServJDOMElement.addContent
+    }
+
 
     public Element setAttribute(String name, String value)
     {
-        // todo: com.xmlserv.util.XmlUtil.cleanupControlCharacters()
+        // todo: com.xmlserv.util.xml.XmlUtil.cleanupControlCharacters()
         if(value == null)
             return super.setAttribute(XmlUtil.cleanupControlCharacters(name), "");
         else

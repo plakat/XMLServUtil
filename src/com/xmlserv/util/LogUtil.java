@@ -2,6 +2,8 @@ package com.xmlserv.util;
 
 import org.apache.log4j.*;
 
+import java.io.*;
+
 /**
  * User: muecke
  * Date: 26.03.2009
@@ -13,13 +15,17 @@ public class LogUtil
     {
         if(e != null)
         {
-            StringBuffer exception = new StringBuffer(e.getMessage() != null ? e.getMessage() : "("+e.getClass().getName()+": message==null)").append(":\n");
-            StackTraceElement[] stackTraceElements = e.getStackTrace();
-            for(StackTraceElement stackTraceElement : stackTraceElements)
-            {
-                exception.append(stackTraceElement.toString()).append("\n");
-            }
-
+//            StringBuilder exception = new StringBuilder(e.getMessage() != null ? e.getMessage() : "("+e.getClass().getName()+": message==null)").append(
+//                    ":\n");
+//            StackTraceElement[] stackTraceElements = e.getStackTrace();
+//            for(StackTraceElement stackTraceElement : stackTraceElements)
+//            {
+//                exception.append(stackTraceElement.toString()).append("\n");
+//            }
+//
+//            logger.warn(exception.toString());
+            StringWriter exception = new StringWriter();
+            e.printStackTrace(new PrintWriter(exception));
             logger.warn(exception.toString());
         }
         else

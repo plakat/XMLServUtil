@@ -11,8 +11,9 @@
  * Last change: $Date: 2009/03/26 16:55:07 $
  */
 
-package com.xmlserv.util;
+package com.xmlserv.util.xml;
 
+import com.xmlserv.util.*;
 import com.xmlserv.util.exceptions.*;
 import org.jdom.*;
 import org.jdom.input.*;
@@ -54,10 +55,18 @@ public class XmlUtil
         {
             // Try to avoid parser error by surrounding with a pair of tags:
             logger.debug("XmlUtil: Adding root Element after parse error "+je.getMessage());
-            xmlIn = "<xmlserv>\n" + xmlIn + "\n</xmlserv>";
+            xmlIn = "<xmlserv>\n" + HtmlUtil.cleanupHtml(xmlIn) + "\n</xmlserv>";
+            //logger.debug("xmlIn="+xmlIn);
             // If it still does not parse, throw an error to the caller:
-            contentDoc = builder.build(new StringReader(xmlIn));
+            try
+            {
+                contentDoc = builder.build(new StringReader(xmlIn));
+            }
+            catch(IOException ignored) // ignored as a StringWriter should not throw an IOException...
+            {}
         }
+        catch(IOException ignored) // ignored as a StringWriter should not throw an IOException...
+        {}
 
 
         if(contentDoc == null)
@@ -121,24 +130,21 @@ public class XmlUtil
 
     /**
      * Convert an Element to a String
+     *
      * @param el
-     * @param encoding
      * @return The String representing the Element
      */
-    public static String elementToString(Element el, String encoding)
+    public static String elementToString(Element el)
     {
         Document document = new Document(el);
-        return documentToString(document, encoding);
+        return documentToString(document);
     }
 
 
-    public static String documentToString(Document in, String encoding)
+    public static String documentToString(Document in)
     {
-        XMLOutputter out = new XMLOutputter();
+        XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
 
-        out.setNewlines(true);
-        out.setTextNormalize(false);
-        out.setEncoding(encoding);
         return out.outputString(in);
     }
 

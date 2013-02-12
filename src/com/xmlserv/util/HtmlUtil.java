@@ -14,8 +14,8 @@
 package com.xmlserv.util;
 
 import com.xmlserv.util.exceptions.*;
+import com.xmlserv.util.xml.*;
 import org.apache.log4j.*;
-import org.apache.regexp.*;
 
 import java.io.*;
 import java.util.regex.*;
@@ -84,6 +84,24 @@ public class HtmlUtil
     public static String repair(String in)
     throws XMLServException
     {
+        String out = cleanupHtml(in);
+        
+        // new version: just try parsing and provide surrounding tag if that fails:
+        try
+        {
+            XmlUtil.toElement(out, null);
+        }
+        catch(org.jdom.JDOMException e)
+        {
+            out = "<xmlserv>" + out + "</xmlserv>";
+        }
+
+        return out;
+    }
+
+
+    public static String cleanupHtml(String in)
+    {
         String out = in;
         out = brPattern.matcher(out).replaceAll("<br />");
 
@@ -97,19 +115,8 @@ public class HtmlUtil
         }
 
         out = ampPattern.matcher(out).replaceAll("&amp;");
-        
-        out = com.xmlserv.util.XmlUtil.cleanupControlCharacters(out);
-        
-        // new version: just try parsing and provide surrounding tag if that fails:
-        try
-        {
-            XmlUtil.toElement(out, null);
-        }
-        catch(org.jdom.JDOMException e)
-        {
-            out = "<xmlserv>" + out + "</xmlserv>";
-        }
 
+        out = XmlUtil.cleanupControlCharacters(out);
         return out;
     }
 

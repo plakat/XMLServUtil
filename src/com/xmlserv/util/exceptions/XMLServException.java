@@ -25,7 +25,7 @@ extends Exception
 
     public XMLServException(Exception e)
     {
-        super(e.getMessage());
+        super(e);
     }
 
 
@@ -38,7 +38,7 @@ extends Exception
 
     public XMLServException(String msg, String code, Exception e)
     {
-        super(msg +": "+e.getMessage()+" (Code): "+code+")");
+        super(msg +": "+e.getMessage()+" (Code): "+code+")", e);
         this.code = code;
         this.exception = e;
     }

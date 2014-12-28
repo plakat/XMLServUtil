@@ -34,38 +34,18 @@ public class HtmlUtil
     {
         String out = in;
 
-//        try
-//        {
-//            RE ampEntity = new RE("&");
-//            out = ampEntity.subst(out, "&amp;");
-            out = out.replaceAll("&", "&amp;");
+        out = out.replaceAll("&", "&amp;");
 
-//            RE ltEntity = new RE("<");
-//            out = ltEntity.subst(out, "&lt;");
-            out = out.replaceAll("<", "&lt;");
+        out = out.replaceAll("<", "&lt;");
 
-//            RE gtEntity = new RE(">");
-//            out = gtEntity.subst(out, "&gt;");
-            out = out.replaceAll(">", "&gt;");
+        out = out.replaceAll(">", "&gt;");
 
-            //[]
-//            RE link = new RE("\\s(http://[^\"\\s]+)\\s");
-//            int i = 0;
-//            while(link.match(out))
-//            {
-//                String thisLink = link.getParen(1);
-//                out = link.subst(out, " <a href=\""+thisLink+"\" target=\"_blank\">"+thisLink+"</a> ", RE.REPLACE_FIRSTONLY);
-//                //System.out.println("Iteration "+i+": thisLink="+thisLink+", out="+out);
-//                i++;
-//            }
-            out = out.replaceAll("\\s(http://[^\"\\s]+)\\s", "<a href=\"$1\" target=\"_blank\">$1</a>");
+        out = out.replaceAll("\\s(http://[^\"\\s]+)\\s", "<a href=\"$1\" target=\"_blank\">$1</a>");
 
-//            RE linebreak = new RE("\n");
-//            out = linebreak.subst(out, "<br/>\n");
-            out = out.replaceAll("[\r\n]+", "<br />\n");
-//        }
-//        catch(RESyntaxException res)
-//        { res.printStackTrace(); }
+        // replace two line breaks with a <p>:
+        out = out.replaceAll("(\r?\n){2}", "<p />");
+
+        out = out.replaceAll("[\r\n]+", "<br />");
 
         return out;
     }
@@ -82,10 +62,10 @@ public class HtmlUtil
      * </ul>
      */
     public static String repair(String in)
-    throws XMLServException
+            throws XMLServException
     {
         String out = cleanupHtml(in);
-        
+
         // new version: just try parsing and provide surrounding tag if that fails:
         try
         {
@@ -155,13 +135,13 @@ public class HtmlUtil
     };
 
     private static Pattern ampPattern = Pattern.compile("(?!&(#[0-9]+|amp|lt|gt|[AOUaou]uml|szlig|euro|nbsp|[nm]dash);)&");
-    
+
 
     /**
      * The XMLServ Logo as HTML with CSS styles.
      */
     public static final String XMLServLogo = "<span style='font-family: Arial,sans-serif; font-size: 110%; text-transform: uppercase;'>XML</span>" +
-                                             "<span style='font-family: Times, serif; font-style: italic; vertical-align: 20%; font-size: 90%; text-transform: capitalize;'>Serv</span>";
+            "<span style='font-family: Times, serif; font-style: italic; vertical-align: 20%; font-size: 90%; text-transform: capitalize;'>Serv</span>";
 
 
     /**

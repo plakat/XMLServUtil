@@ -1,6 +1,6 @@
 package com.xmlserv.util.xml;
 
-import org.jdom.*;
+import org.jdom2.*;
 
 /**
  * User: muecke

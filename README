@@ -8,6 +8,6 @@ The two current parts are:
 *) A helper class for dynamically constructing PreparedStatement isntances and setting the values to be used for placeholders in the query. Another version uses named placeholders.
 
 To compile this library the following JARs are needed in directory ../XMLServUtilDep/lib:
-*) jdom-1.1.3.jar
+*) jdom2-2.0.6.jar
 *) junit-4.10.jar
 *) junit-dep-4.10.jar

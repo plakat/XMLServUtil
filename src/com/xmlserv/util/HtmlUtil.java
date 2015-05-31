@@ -16,6 +16,7 @@ package com.xmlserv.util;
 import com.xmlserv.util.exceptions.*;
 import com.xmlserv.util.xml.*;
 import org.apache.log4j.*;
+import org.jdom2.*;
 
 import java.io.*;
 import java.util.regex.*;
@@ -71,7 +72,7 @@ public class HtmlUtil
         {
             XmlUtil.toElement(out, null);
         }
-        catch(org.jdom.JDOMException e)
+        catch(JDOMException e)
         {
             out = "<xmlserv>" + out + "</xmlserv>";
         }

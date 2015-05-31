@@ -2,7 +2,7 @@ package com.xmlserv.util.xml;
 
 import com.xmlserv.util.*;
 import com.xmlserv.util.exceptions.*;
-import org.jdom.*;
+import org.jdom2.*;
 
 import java.text.*;
 import java.util.*;

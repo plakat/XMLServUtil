@@ -15,9 +15,9 @@ package com.xmlserv.util.xml;
 
 import com.xmlserv.util.*;
 import com.xmlserv.util.exceptions.*;
-import org.jdom.*;
-import org.jdom.input.*;
-import org.jdom.output.*;
+import org.jdom2.*;
+import org.jdom2.input.*;
+import org.jdom2.output.*;
 import org.apache.log4j.*;
 
 import java.io.*;
@@ -33,7 +33,7 @@ public class XmlUtil
      * @param tagname The tag to cut out of the parsed string. Set to null to return the root element.
      */
     public static Element toElement(String xmlIn, String tagname)
-            throws org.jdom.JDOMException, XMLServException
+            throws JDOMException, XMLServException
     {
         Logger logger = Logger.getLogger(XmlUtil.class);
         long startTstamp = System.currentTimeMillis();
@@ -97,7 +97,7 @@ public class XmlUtil
      * @param xmlIn String to parse
      */
     public static Element toElement(String xmlIn)
-            throws org.jdom.JDOMException, XMLServException
+            throws JDOMException, XMLServException
     {
         return toElement(xmlIn, null);
     }

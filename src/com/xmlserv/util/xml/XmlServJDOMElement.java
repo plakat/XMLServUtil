@@ -139,6 +139,15 @@ public class XmlServJDOMElement
     }
 
 
+    public Element setAttributes(Map<String,String> attributes) {
+        for(String attribute : attributes.keySet()) {
+            setAttribute(attribute, attributes.get(attribute));
+        }
+
+        return this;
+    }
+
+
     public Element addContentAsHtml(String text) throws XMLServException, JDOMException
     {
         return super.addContent(XmlUtil.toElement(HtmlUtil.repair(HtmlUtil.htmlize(XmlUtil.cleanupControlCharacters(text.trim())))));
@@ -151,5 +160,10 @@ public class XmlServJDOMElement
             return super.setAttribute(name, buffer.toString());
         else
             return super.setAttribute(name, "");
+    }
+
+    
+    public Element setAttribute(String name, Object value) {
+        return this.setAttribute(name, value.toString());
     }
 }

@@ -2,6 +2,7 @@ package com.xmlserv.util.xml;
 
 import com.xmlserv.util.*;
 import com.xmlserv.util.exceptions.*;
+import org.apache.log4j.*;
 import org.jdom2.*;
 
 import java.text.*;
@@ -53,7 +54,7 @@ public class XmlServJDOMElement
         if(s == null)
             return super.addContent("");
         else
-            return super.addContent(s);
+            return super.addContent(XmlUtil.cleanupControlCharacters(s));
     }
 
 
@@ -95,11 +96,20 @@ public class XmlServJDOMElement
 
     public Element setAttribute(String name, String value)
     {
-        // todo: com.xmlserv.util.xml.XmlUtil.cleanupControlCharacters()
+        String nameCleaned = XmlUtil.cleanupControlCharacters(name);
+        if(nameCleaned == null || nameCleaned.isEmpty())
+            return this;
         if(value == null)
-            return super.setAttribute(XmlUtil.cleanupControlCharacters(name), "");
-        else
-            return super.setAttribute(XmlUtil.cleanupControlCharacters(name), XmlUtil.cleanupControlCharacters(value));
+            return super.setAttribute(nameCleaned, "");
+        else {
+            String valueCleaned = XmlUtil.cleanupControlCharacters(value);
+            if(valueCleaned == null) {
+                Logger.getLogger(XmlServJDOMElement.class).warn("attribute value is null after cleanup, initial value="+value);
+                return super.setAttribute(nameCleaned, "");
+            } else {
+                return super.setAttribute(nameCleaned, valueCleaned);
+            }
+        }
     }
 
 
@@ -162,8 +172,12 @@ public class XmlServJDOMElement
             return super.setAttribute(name, "");
     }
 
-    
+
     public Element setAttribute(String name, Object value) {
+        if(value instanceof Boolean) {
+            return this.setAttribute(name, (boolean) value);
+        }
+
         return this.setAttribute(name, value.toString());
     }
 }

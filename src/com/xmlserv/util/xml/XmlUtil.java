@@ -179,11 +179,14 @@ public class XmlUtil
      */
     public static String cleanupControlCharacters(String in)
     {
+        if(in == null)
+            return "";
+
         return in.replaceAll("\\u0084", "\u201E")
                 .replaceAll("\\u0093", "\u201C")
                 .replaceAll("\\u0095", "\u2022")
                 .replaceAll("\\u0096", "\u2013")
-                .replaceAll("[\\u0001-\\u0008]", "")
+                .replaceAll("[\\u0000-\\u0008]", "")
                 .replaceAll("[\\u000B-\\u000C]", "")
                 .replaceAll("[\\u000E-\\u001F]", "")
                 .replaceAll("[\\u007F-\\u0084]", "")

@@ -38,7 +38,7 @@ extends Exception
 
     public XMLServException(String msg, String code, Exception e)
     {
-        super(msg +": "+e.getMessage()+" (Code): "+code+")", e);
+        super(msg +(e.getMessage() != null ? ": "+e.getMessage() : "")+(code != null && !code.isEmpty() ? " ("+code+")" : ""), e);
         this.code = code;
         this.exception = e;
     }
@@ -46,7 +46,9 @@ extends Exception
 
     public String toString()
     {
-        return getMessage()+" Code: "+this.code;
+        return getMessage()
+                //+" Code: "+this.code;
+        ;
     }
 
 

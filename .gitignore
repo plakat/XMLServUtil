@@ -1,0 +1,8 @@
+.DS_Store
+build/classes/**/*.class
+classes/**/*.class
+config/**/xmlserv.jar
+*.war
+*.jar
+config/*/WEB-INF/classes
+tmp/**

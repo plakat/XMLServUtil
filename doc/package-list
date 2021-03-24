@@ -1,0 +1,5 @@
+com.xmlserv.util
+com.xmlserv.util.db
+com.xmlserv.util.exceptions
+com.xmlserv.util.tests
+com.xmlserv.util.xml
